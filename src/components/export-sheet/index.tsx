@@ -1,9 +1,13 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
-import { isEmpty, isFunction } from 'lodash'
-import XLSX from 'xlsx'
+import { isEmpty } from 'lodash'
+import * as X from 'xlsx'
+const XLSX: any = X
+type map = {
+  [propName:string] : any
+}
 
-const supportExt = [
+const supportExt: Array<string> = [
   'xlsx',
   'xlsm',
   'xlsb',
@@ -21,8 +25,32 @@ const supportExt = [
   'eth',
 ]
 
-class ExportSheet extends PureComponent {
-  constructor(props) {
+interface HeaderItem {
+  title: string
+  dataIndex: string
+}
+interface HeaderOption {
+  dateNF: string
+  skipHeader: boolean
+}
+interface Props {
+  dataType: string
+  header: Array<HeaderItem>
+  headerOption: HeaderOption
+  dataSource: Array<object>
+  fileName: string
+  fileDate: string
+  extName: string
+  isRequiredNameDate: boolean
+}
+
+interface State {
+  utilsName: string
+  dataSource: Array<object>
+}
+
+class ExportSheet extends PureComponent<Props, State> {
+  constructor(props: Props) {
     super(props)
     if (!supportExt.includes(props.extName)) throw new Error('extName not suport')
     this.importType = {
@@ -35,8 +63,38 @@ class ExportSheet extends PureComponent {
       dataSource: props.dataSource,
     }
   }
+  importType: map
+  static propTypes = {
+    dataType: PropTypes.oneOf(['Array-of-Arrays', 'Array-of-Object']),
+    header: PropTypes.arrayOf(PropTypes.shape({
+      title: PropTypes.string,
+      dataIndex: PropTypes.string,
+    })),
+    headerOption: PropTypes.shape({
+      dateNF: PropTypes.string, // 在字符串输出中使用指定的日期格式
+      skipHeader: PropTypes.bool,
+    }),
+    dataSource: PropTypes.array,
+    fileName: PropTypes.string,
+    fileDate: PropTypes.string,
+    extName: PropTypes.oneOf(supportExt),
+    isRequiredNameDate: PropTypes.bool,
+  }
+  static defaultProps = {
+    dataType: 'Array-of-Object',
+    header: [],
+    headerOption: {
+      skipHeader: false,
+      dateNF: 'FMT 14',
+    },
+    dataSource: [],
+    extName: 'xlsx',
+    isRequiredNameDate: true,
+    fileName: '',
+    fileDate: new Date().toLocaleDateString(),
+  }
   // 存储新的dataSource
-  static getDerivedStateFromProps(props, state) {
+  static getDerivedStateFromProps(props: Props, state: State) {
     if (props.dataSource !== state.dataSource) {
       return {
         dataSource: props.dataSource,
@@ -48,13 +106,13 @@ class ExportSheet extends PureComponent {
     const { header, headerOption } = this.props
     const { dataSource } = this.state
     const { dataType } = this.props
-    const resultValues = []
-    const resultHeaders = []
+    const resultValues: Array<object> = []
+    const resultHeaders: Array<string> = []
     // !Array.isArray(props.dataSource[0]))
     if (dataType === 'Array-of-Object') {
-      dataSource.map(value => {
+      dataSource.map((value:map) => {
         if (isEmpty(value)) throw new Error('dataSource must be like Array-of-Object type, the Object not be empty')
-        const dealedObj = {}
+        const dealedObj:map = {}
         header.map(key => {
           dealedObj[key.title] = value[key.dataIndex]
           if (resultValues.includes(dealedObj)) return true
@@ -80,11 +138,9 @@ class ExportSheet extends PureComponent {
         { ...headerOption },
       ]
     }
+    return []
   }
-  exportFile = (e) => {
-    if (isFunction(this.getOriginProps.onClick)) {
-      this.getOriginProps.onClick(e)
-    }
+  exportFile = ():any => {
     const { utilsName, dataSource } = this.state
     if (!dataSource.length) return
     const value = this.toRightDate()
@@ -96,60 +152,23 @@ class ExportSheet extends PureComponent {
     XLSX.utils.book_append_sheet(wb, ws, formatName)
     XLSX.writeFile(wb, `${formatName}.${extName}`)
   }
-  get getOriginProps() {
-    const { children } = this.props
-    let child = null
-    if (Array.isArray(children)) {
-      child = children[0]
-    } else {
-      child = children
-    }
-    return child.props
-  }
   render() {
     const { children } = this.props
-    let ResultElement = null
-    if (Array.isArray(children)) {
-      ResultElement = React.cloneElement(children[0], {
-        onClick: this.exportFile,
-      })
+    let ResultElement: React.ReactNode | null = null
+    if (React.isValidElement(children)) {
+      ResultElement = React.cloneElement(React.Children.only(children), {
+        exportSheet: this.exportFile
+      } as any)
     } else {
-      ResultElement = React.cloneElement(children, {
-        onClick: this.exportFile,
-      })
+      throw new Error('The Children must be a React Element !')
     }
-
-    return ResultElement
+    return (
+      <div onClick={this.exportFile}>
+        {ResultElement}
+      </div>
+    )
   }
 }
 
-ExportSheet.propTypes = {
-  dataType: PropTypes.oneOf(['Array-of-Arrays', 'Array-of-Object']),
-  header: PropTypes.arrayOf(PropTypes.shape({
-    title: PropTypes.string,
-    dataIndex: PropTypes.string,
-  })),
-  headerOption: PropTypes.shape({
-    dateNF: PropTypes.string, // 在字符串输出中使用指定的日期格式
-    skipHeader: PropTypes.bool,
-  }),
-  dataSource: PropTypes.array,
-  fileName: PropTypes.string,
-  fileDate: PropTypes.string,
-  extName: PropTypes.oneOf(supportExt),
-  isRequiredNameDate: PropTypes.bool,
-}
-ExportSheet.defaultProps = {
-  dataType: 'Array-of-Object',
-  header: [],
-  headerOption: {
-    skipHeader: false,
-    dateNF: 'FMT 14',
-  },
-  dataSource: [],
-  extName: 'xlsx',
-  isRequiredNameDate: true,
-  fileName: '',
-  fileDate: new Date().toLocaleDateString(),
-}
+
 export default ExportSheet

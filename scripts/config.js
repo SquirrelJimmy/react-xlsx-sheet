@@ -1,39 +1,51 @@
 const path = require('path')
 const fs = require('fs')
 const pkg = require('../package.json')
-const typescript = require('typescript')
-const rollupTypescript = require('rollup-plugin-typescript')
-const {uglify} = require('rollup-plugin-uglify')
-// const commonjs = require('rollup-plugin-commonjs')
-const resolve = require('rollup-plugin-node-resolve')
+// const typescript = require('typescript')
 
 const env = process.env.NODE_ENV
 const target = process.env.TARGET
-
-const plugins = [
-  rollupTypescript({ typescript, importHelpers: true }),
-  resolve(),
+const useTypeScript = true
+const moduleFileExtensions = [
+  'web.mjs',
+  'mjs',
+  'web.js',
+  'js',
+  'web.ts',
+  'ts',
+  'web.tsx',
+  'tsx',
+  'json',
+  'web.jsx',
+  'jsx',
 ]
-
-if (env === 'production') {
-
-} else {
-  plugins.push(uglify())
-}
-
-if (!fs.existsSync('dist')) {
-  fs.mkdirSync('dist')
-}
-
 const config = {
-  input: path.resolve(__dirname, '../', 'src/index.tsx'),
-  output: {
-    file: path.resolve(__dirname, '../', 'dist/index.js'),
-    format: target,
-    name: pkg.name
+  mode: 'development',
+  entry: {
+    vendor: ['react', 'react-dom'],
+    index: path.resolve(__dirname, '../src/index.tsx')
   },
-  plugins,
+  output: {
+    path: path.resolve(__dirname, '../dist'),
+    filename: '[name].js',
+    libraryTarget: 'umd'
+  },
+  resolve: {
+    extensions: moduleFileExtensions
+      .map(ext => `.${ext}`)
+      .filter(ext => useTypeScript || !ext.includes('ts')),
+  },
+  module: {
+    rules: [
+      {
+        test: /\.ts(x?)$/,
+				exclude: ['/node_modules/'],
+				use: [
+					'ts-loader',
+				]
+      }
+    ]
+  }
 }
-
 
 module.exports = config
