@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
-import { isEmpty } from 'lodash'
+import isEmpty from 'lodash/isEmpty'
 import * as X from 'xlsx'
 const XLSX: any = X
 type map = {

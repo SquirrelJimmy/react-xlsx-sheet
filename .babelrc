@@ -1,0 +1,46 @@
+{
+  "env": {
+    "development": {
+      "presets": [
+        ["@babel/preset-env", {
+          "targets": {
+            "browsers": ["last 2 versions", "safari >= 7", "ie >= 11"]
+          }
+        }],
+        "@babel/preset-react",
+        "@babel/preset-typescript",
+      ],
+      "plugins": [
+        ["@babel/plugin-transform-typescript", {
+          "isTSX": true
+        }],
+        ["@babel/plugin-proposal-class-properties", {
+          "loose": true
+        }]
+      ]
+    },
+    "build": {
+      "presets": [
+        ["@babel/preset-env", {
+          "targets": {
+            "browsers": ["last 2 versions", "safari >= 7", "ie >= 11"]
+          }
+        }],
+        "@babel/preset-react",
+        "@babel/preset-typescript",
+      ],
+      "plugins": [
+        ["@babel/plugin-transform-typescript", {
+          "isTSX": true
+        }],
+        ["@babel/plugin-proposal-class-properties", {
+          "loose": true
+        }]
+      ],
+      "ignore": [
+        "**/__tests__/*.js",
+        "**/fake-*"
+      ]
+    }
+  }
+}

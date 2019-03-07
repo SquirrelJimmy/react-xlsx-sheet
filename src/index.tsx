@@ -1,7 +1,1 @@
-import ExportSheet from './components/export-sheet'
-
-
-
-export {
-  ExportSheet
-}
+export { default as ExportSheet } from './components/export-sheet'
