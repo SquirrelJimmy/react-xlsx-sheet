@@ -1,12 +1,14 @@
 {
   "env": {
-    "development": {
+    "es": {
       "presets": [
         ["@babel/preset-env", {
           "targets": {
-            "browsers": ["last 2 versions", "safari >= 7", "ie >= 11"]
-          }
-        }],
+            "chrome": 72
+          },
+          "modules": false,
+          "loose": true
+      }],
         "@babel/preset-react",
         "@babel/preset-typescript",
       ],
@@ -17,9 +19,13 @@
         ["@babel/plugin-proposal-class-properties", {
           "loose": true
         }]
+      ],
+      "ignore": [
+        "**/__tests__/*.js",
+        "**/*.d.ts"
       ]
     },
-    "build": {
+    "lib": {
       "presets": [
         ["@babel/preset-env", {
           "targets": {
@@ -39,7 +45,7 @@
       ],
       "ignore": [
         "**/__tests__/*.js",
-        "**/fake-*"
+        "**/*.d.ts"
       ]
     }
   }

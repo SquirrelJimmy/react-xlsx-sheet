@@ -1,5 +1,4 @@
 const path = require('path')
-const fs = require('fs')
 const pkg = require('../package.json')
 const webpack = require('webpack')
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin')

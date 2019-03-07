@@ -13,8 +13,9 @@
     "es"
   ],
   "scripts": {
-    "build": "cross-env BABEL_ENV=build NODE_ENV=production babel src --extensions '.tsx,.ts' --out-dir dist/module && webpack --config ./scripts/webpack.config.js",
-    "build:es": "cross-env BABEL_ENV=build NODE_ENV=production TARGET=es webpack --config ./scripts/webpack.config.js"
+    "build": "cross-env BABEL_ENV=lib NODE_ENV=production webpack --config ./scripts/webpack.config.js",
+    "build:lib": "cross-env BABEL_ENV=lib babel src --extensions '.tsx,.ts' --out-dir ./lib",
+    "build:es": "cross-env BABEL_ENV=es  babel src --extensions '.tsx,.ts' --out-dir ./es"
   },
   "keywords": [
     "react-xlsx",
@@ -31,7 +32,9 @@
     "@babel/preset-react": "^7.0.0",
     "@babel/preset-typescript": "^7.3.3",
     "babel-loader": "^8.0.5",
+    "commitizen": "^3.0.7",
     "cross-env": "^5.2.0",
+    "cz-emoji": "^1.1.2",
     "tslib": "^1.9.3",
     "typescript": "^3.3.3333",
     "uglifyjs-webpack-plugin": "^2.1.2",
@@ -48,5 +51,10 @@
     "react-dom": "^16.8.3",
     "xlsx": "^0.14.1"
   },
-  "type-check": "tsc"
+  "type-check": "tsc",
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-emoji"
+    }
+  }
 }
