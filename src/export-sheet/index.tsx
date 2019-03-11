@@ -1,8 +1,8 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import isEmpty from 'lodash/isEmpty'
-import * as X from 'xlsx'
-const XLSX: any = X
+import isFunction from 'lodash/isFunction'
+
 type map = {
   [propName: string]: any,
 }
@@ -41,8 +41,9 @@ interface Props {
   fileName: string
   fileDate: string
   extName: string
-  isRequiredNameDate: boolean
-  className?: string
+  isDOMElement: boolean,
+  isRequiredNameDate: boolean,
+  xlsx: any
 }
 
 interface State {
@@ -66,7 +67,8 @@ class ExportSheet extends PureComponent<Props, State> {
     fileDate: PropTypes.string,
     extName: PropTypes.oneOf(supportExt),
     isRequiredNameDate: PropTypes.bool,
-    className: PropTypes.string,
+    isDOMElement: PropTypes.bool.isRequired,
+    xlsx: PropTypes.object.isRequired,
   }
   static defaultProps = {
     dataType: 'Array-of-Object',
@@ -79,6 +81,7 @@ class ExportSheet extends PureComponent<Props, State> {
     extName: 'xlsx',
     isRequiredNameDate: true,
     fileName: '',
+    isDOMElement: true,
     fileDate: new Date().toLocaleDateString(),
   }
   // 存储新的dataSource
@@ -91,6 +94,7 @@ class ExportSheet extends PureComponent<Props, State> {
     return null
   }
   importType: map
+  XLSX: any = this.props.xlsx
   constructor(props: Props) {
     super(props)
     if (!supportExt.includes(props.extName)) throw new Error('extName not suport')
@@ -136,7 +140,7 @@ class ExportSheet extends PureComponent<Props, State> {
         return null
       })
       return [
-        header,
+        dataSource,
         { ...headerOption },
       ]
     }
@@ -149,26 +153,35 @@ class ExportSheet extends PureComponent<Props, State> {
     const { extName, fileName, isRequiredNameDate, fileDate } = this.props
     const name = isRequiredNameDate ? `${fileName}__${fileDate}` : fileName
     const formatName = name.replace(/\\|\/|\?|\*|\[|\]|\s|\{|\}/g, '_')
-    const ws = XLSX.utils[utilsName](...value)
-    const wb = XLSX.utils.book_new()
-    XLSX.utils.book_append_sheet(wb, ws, formatName)
-    XLSX.writeFile(wb, `${formatName}.${extName}`)
+    const ws = this.XLSX.utils[utilsName](...value)
+    const wb = this.XLSX.utils.book_new()
+    this.XLSX.utils.book_append_sheet(wb, ws, formatName)
+    this.XLSX.writeFile(wb, `${formatName}.${extName}`)
   }
   render() {
-    const { children, className } = this.props
-    let ResultElement: React.ReactNode | null = null
+    const { children, isDOMElement } = this.props
+    let ResultElement: React.ReactNode
     if (React.isValidElement(children)) {
-      ResultElement = React.cloneElement(React.Children.only(children), {
-        exportSheet: this.exportFile,
-      } as any)
+      const originHandler = (children.props as any).onClick
+      if (isDOMElement) {
+        const exportHandler = (event: React.SyntheticEvent): any => {
+          this.exportFile()
+          if (isFunction(originHandler)) {
+            originHandler(event)
+          }
+        }
+        ResultElement = React.cloneElement(React.Children.only(children), {
+          onClick: exportHandler,
+        } as any)
+      } else {
+        ResultElement = React.cloneElement(React.Children.only(children), {
+          exportsheet: this.exportFile,
+        } as any)
+      }
     } else {
-      throw new Error('The Children must be a React Element !')
+      throw new Error('The Children must be a valid React Element !')
     }
-    return (
-      <div {...(className ? {className} : {})} onClick={this.exportFile}>
-        {ResultElement}
-      </div>
-    )
+    return ResultElement
   }
 }
 

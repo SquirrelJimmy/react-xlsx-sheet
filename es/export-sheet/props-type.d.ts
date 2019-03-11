@@ -15,5 +15,4 @@ export interface Props {
   fileDate: string
   extName: string
   isRequiredNameDate: boolean
-  className?: string
 }

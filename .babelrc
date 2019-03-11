@@ -46,7 +46,8 @@
       "ignore": [
         "**/__tests__/*.js",
         "**/*.d.ts",
-        "**/*.test.ts"
+        "**/*.test.ts",
+        "**/*.test.js"
       ]
     }
   }

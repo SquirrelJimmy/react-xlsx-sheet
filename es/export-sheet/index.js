@@ -3,8 +3,7 @@ function _extends() { _extends = Object.assign || function (target) { for (var i
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import isEmpty from 'lodash/isEmpty';
-import * as X from 'xlsx';
-const XLSX = X;
+import isFunction from 'lodash/isFunction';
 const supportExt = ['xlsx', 'xlsm', 'xlsb', 'xls', 'ods', 'fods', 'csv', 'txt', 'sylk', 'html', 'dif', 'dbf', 'rtf', 'prn', 'eth'];
 
 class ExportSheet extends PureComponent {
@@ -20,6 +19,7 @@ class ExportSheet extends PureComponent {
 
   constructor(props) {
     super(props);
+    this.XLSX = this.props.xlsx;
 
     this.exportFile = () => {
       const _this$state = this.state,
@@ -34,10 +34,10 @@ class ExportSheet extends PureComponent {
             fileDate = _this$props.fileDate;
       const name = isRequiredNameDate ? `${fileName}__${fileDate}` : fileName;
       const formatName = name.replace(/\\|\/|\?|\*|\[|\]|\s|\{|\}/g, '_');
-      const ws = XLSX.utils[utilsName](...value);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, formatName);
-      XLSX.writeFile(wb, `${formatName}.${extName}`);
+      const ws = this.XLSX.utils[utilsName](...value);
+      const wb = this.XLSX.utils.book_new();
+      this.XLSX.utils.book_append_sheet(wb, ws, formatName);
+      this.XLSX.writeFile(wb, `${formatName}.${extName}`);
     };
 
     if (!supportExt.includes(props.extName)) throw new Error('extName not suport');
@@ -85,7 +85,7 @@ class ExportSheet extends PureComponent {
         if (!Array.isArray(item)) throw new Error('dataSource must be like Array-of-Arrays type');
         return null;
       });
-      return [header, _extends({}, headerOption)];
+      return [dataSource, _extends({}, headerOption)];
     }
 
     return [];
@@ -94,22 +94,34 @@ class ExportSheet extends PureComponent {
   render() {
     const _this$props3 = this.props,
           children = _this$props3.children,
-          className = _this$props3.className;
-    let ResultElement = null;
+          isDOMElement = _this$props3.isDOMElement;
+    let ResultElement;
 
     if (React.isValidElement(children)) {
-      ResultElement = React.cloneElement(React.Children.only(children), {
-        exportSheet: this.exportFile
-      });
+      const originHandler = children.props.onClick;
+
+      if (isDOMElement) {
+        const exportHandler = event => {
+          this.exportFile();
+
+          if (isFunction(originHandler)) {
+            originHandler(event);
+          }
+        };
+
+        ResultElement = React.cloneElement(React.Children.only(children), {
+          onClick: exportHandler
+        });
+      } else {
+        ResultElement = React.cloneElement(React.Children.only(children), {
+          exportsheet: this.exportFile
+        });
+      }
     } else {
-      throw new Error('The Children must be a React Element !');
+      throw new Error('The Children must be a valid React Element !');
     }
 
-    return React.createElement("div", _extends({}, className ? {
-      className
-    } : {}, {
-      onClick: this.exportFile
-    }), ResultElement);
+    return ResultElement;
   }
 
 }
@@ -130,7 +142,8 @@ ExportSheet.propTypes = {
   fileDate: PropTypes.string,
   extName: PropTypes.oneOf(supportExt),
   isRequiredNameDate: PropTypes.bool,
-  className: PropTypes.string
+  isDOMElement: PropTypes.bool.isRequired,
+  xlsx: PropTypes.object.isRequired
 };
 ExportSheet.defaultProps = {
   dataType: 'Array-of-Object',
@@ -143,6 +156,7 @@ ExportSheet.defaultProps = {
   extName: 'xlsx',
   isRequiredNameDate: true,
   fileName: '',
+  isDOMElement: true,
   fileDate: new Date().toLocaleDateString() // 存储新的dataSource
 
 };
