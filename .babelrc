@@ -22,7 +22,11 @@
       ],
       "ignore": [
         "**/__tests__/*.js",
-        "**/*.d.ts"
+        "**/*.d.ts",
+        "**/*.test.ts",
+        "**/*.test.tsx",
+        "**/*.test.js",
+        "**/*.test.jsx"
       ]
     },
     "lib": {
@@ -47,7 +51,9 @@
         "**/__tests__/*.js",
         "**/*.d.ts",
         "**/*.test.ts",
-        "**/*.test.js"
+        "**/*.test.tsx",
+        "**/*.test.js",
+        "**/*.test.jsx"
       ]
     }
   }
