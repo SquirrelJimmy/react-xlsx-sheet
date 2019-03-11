@@ -1,3 +1,5 @@
+function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import isEmpty from 'lodash/isEmpty';
@@ -6,22 +8,30 @@ const XLSX = X;
 const supportExt = ['xlsx', 'xlsm', 'xlsb', 'xls', 'ods', 'fods', 'csv', 'txt', 'sylk', 'html', 'dif', 'dbf', 'rtf', 'prn', 'eth'];
 
 class ExportSheet extends PureComponent {
+  static getDerivedStateFromProps(props, state) {
+    if (props.dataSource !== state.dataSource) {
+      return {
+        dataSource: props.dataSource
+      };
+    }
+
+    return null;
+  }
+
   constructor(props) {
     super(props);
 
     this.exportFile = () => {
-      const {
-        utilsName,
-        dataSource
-      } = this.state;
+      const _this$state = this.state,
+            utilsName = _this$state.utilsName,
+            dataSource = _this$state.dataSource;
       if (!dataSource.length) return;
       const value = this.toRightDate();
-      const {
-        extName,
-        fileName,
-        isRequiredNameDate,
-        fileDate
-      } = this.props;
+      const _this$props = this.props,
+            extName = _this$props.extName,
+            fileName = _this$props.fileName,
+            isRequiredNameDate = _this$props.isRequiredNameDate,
+            fileDate = _this$props.fileDate;
       const name = isRequiredNameDate ? `${fileName}__${fileDate}` : fileName;
       const formatName = name.replace(/\\|\/|\?|\*|\[|\]|\s|\{|\}/g, '_');
       const ws = XLSX.utils[utilsName](...value);
@@ -42,27 +52,12 @@ class ExportSheet extends PureComponent {
     };
   }
 
-  static getDerivedStateFromProps(props, state) {
-    if (props.dataSource !== state.dataSource) {
-      return {
-        dataSource: props.dataSource
-      };
-    }
-
-    return null;
-  }
-
   toRightDate() {
-    const {
-      header,
-      headerOption
-    } = this.props;
-    const {
-      dataSource
-    } = this.state;
-    const {
-      dataType
-    } = this.props;
+    const _this$props2 = this.props,
+          header = _this$props2.header,
+          headerOption = _this$props2.headerOption;
+    const dataSource = this.state.dataSource;
+    const dataType = this.props.dataType;
     const resultValues = [];
     const resultHeaders = []; // !Array.isArray(props.dataSource[0]))
 
@@ -80,10 +75,9 @@ class ExportSheet extends PureComponent {
         });
         return true;
       });
-      return [resultValues, {
-        header: resultHeaders,
-        ...headerOption
-      }];
+      return [resultValues, _extends({
+        header: resultHeaders
+      }, headerOption)];
     }
 
     if (dataType === 'Array-of-Arrays') {
@@ -91,17 +85,16 @@ class ExportSheet extends PureComponent {
         if (!Array.isArray(item)) throw new Error('dataSource must be like Array-of-Arrays type');
         return null;
       });
-      return [header, { ...headerOption
-      }];
+      return [header, _extends({}, headerOption)];
     }
 
     return [];
   }
 
   render() {
-    const {
-      children
-    } = this.props;
+    const _this$props3 = this.props,
+          children = _this$props3.children,
+          className = _this$props3.className;
     let ResultElement = null;
 
     if (React.isValidElement(children)) {
@@ -112,9 +105,11 @@ class ExportSheet extends PureComponent {
       throw new Error('The Children must be a React Element !');
     }
 
-    return React.createElement("div", {
+    return React.createElement("div", _extends({}, className ? {
+      className
+    } : {}, {
       onClick: this.exportFile
-    }, ResultElement);
+    }), ResultElement);
   }
 
 }
@@ -134,7 +129,8 @@ ExportSheet.propTypes = {
   fileName: PropTypes.string,
   fileDate: PropTypes.string,
   extName: PropTypes.oneOf(supportExt),
-  isRequiredNameDate: PropTypes.bool
+  isRequiredNameDate: PropTypes.bool,
+  className: PropTypes.string
 };
 ExportSheet.defaultProps = {
   dataType: 'Array-of-Object',

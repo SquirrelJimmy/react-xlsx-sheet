@@ -4,7 +4,7 @@ import isEmpty from 'lodash/isEmpty'
 import * as X from 'xlsx'
 const XLSX: any = X
 type map = {
-  [propName:string] : any
+  [propName: string]: any,
 }
 
 const supportExt: Array<string> = [
@@ -42,6 +42,7 @@ interface Props {
   fileDate: string
   extName: string
   isRequiredNameDate: boolean
+  className?: string
 }
 
 interface State {
@@ -50,20 +51,6 @@ interface State {
 }
 
 class ExportSheet extends PureComponent<Props, State> {
-  constructor(props: Props) {
-    super(props)
-    if (!supportExt.includes(props.extName)) throw new Error('extName not suport')
-    this.importType = {
-      'Array-of-Arrays': 'aoa_to_sheet',
-      'Array-of-Object': 'json_to_sheet',
-    }
-    if (!this.importType[props.dataType]) throw new Error('dataType must be oneOf ["Array-of-Arrays", "Array-of-Object"]')
-    this.state = {
-      utilsName: this.importType[props.dataType],
-      dataSource: props.dataSource,
-    }
-  }
-  importType: map
   static propTypes = {
     dataType: PropTypes.oneOf(['Array-of-Arrays', 'Array-of-Object']),
     header: PropTypes.arrayOf(PropTypes.shape({
@@ -79,6 +66,7 @@ class ExportSheet extends PureComponent<Props, State> {
     fileDate: PropTypes.string,
     extName: PropTypes.oneOf(supportExt),
     isRequiredNameDate: PropTypes.bool,
+    className: PropTypes.string,
   }
   static defaultProps = {
     dataType: 'Array-of-Object',
@@ -102,6 +90,20 @@ class ExportSheet extends PureComponent<Props, State> {
     }
     return null
   }
+  importType: map
+  constructor(props: Props) {
+    super(props)
+    if (!supportExt.includes(props.extName)) throw new Error('extName not suport')
+    this.importType = {
+      'Array-of-Arrays': 'aoa_to_sheet',
+      'Array-of-Object': 'json_to_sheet',
+    }
+    if (!this.importType[props.dataType]) throw new Error('dataType must be oneOf ["Array-of-Arrays", "Array-of-Object"]')
+    this.state = {
+      utilsName: this.importType[props.dataType],
+      dataSource: props.dataSource,
+    }
+  }
   toRightDate() {
     const { header, headerOption } = this.props
     const { dataSource } = this.state
@@ -110,9 +112,9 @@ class ExportSheet extends PureComponent<Props, State> {
     const resultHeaders: Array<string> = []
     // !Array.isArray(props.dataSource[0]))
     if (dataType === 'Array-of-Object') {
-      dataSource.map((value:map) => {
+      dataSource.map((value: map) => {
         if (isEmpty(value)) throw new Error('dataSource must be like Array-of-Object type, the Object not be empty')
-        const dealedObj:map = {}
+        const dealedObj: map = {}
         header.map(key => {
           dealedObj[key.title] = value[key.dataIndex]
           if (resultValues.includes(dealedObj)) return true
@@ -140,7 +142,7 @@ class ExportSheet extends PureComponent<Props, State> {
     }
     return []
   }
-  exportFile = ():any => {
+  exportFile = (): any => {
     const { utilsName, dataSource } = this.state
     if (!dataSource.length) return
     const value = this.toRightDate()
@@ -153,22 +155,21 @@ class ExportSheet extends PureComponent<Props, State> {
     XLSX.writeFile(wb, `${formatName}.${extName}`)
   }
   render() {
-    const { children } = this.props
+    const { children, className } = this.props
     let ResultElement: React.ReactNode | null = null
     if (React.isValidElement(children)) {
       ResultElement = React.cloneElement(React.Children.only(children), {
-        exportSheet: this.exportFile
+        exportSheet: this.exportFile,
       } as any)
     } else {
       throw new Error('The Children must be a React Element !')
     }
     return (
-      <div onClick={this.exportFile}>
+      <div {...(className ? {className} : {})} onClick={this.exportFile}>
         {ResultElement}
       </div>
     )
   }
 }
-
 
 export default ExportSheet

@@ -13,9 +13,10 @@
     "es"
   ],
   "scripts": {
-    "build": "cross-env BABEL_ENV=lib NODE_ENV=production webpack --config ./scripts/webpack.config.js",
-    "build:lib": "cross-env BABEL_ENV=lib babel src --extensions '.tsx,.ts' --out-dir ./lib",
-    "build:es": "cross-env BABEL_ENV=es  babel src --extensions '.tsx,.ts' --out-dir ./es"
+    "build:all": "node ./scripts/build.js",
+    "build:dist": "cross-env NODE_ENV=production webpack --config ./scripts/webpack.config.js",
+    "build:lib": "cross-env BABEL_ENV=lib babel src --extensions '.tsx,.ts' --out-dir ./lib && cross-env BABEL_ENV=lib node ./scripts/copyDts.js",
+    "build:es": "cross-env BABEL_ENV=es  babel src --extensions '.tsx,.ts' --out-dir ./es && cross-env BABEL_ENV=es node ./scripts/copyDts.js"
   },
   "keywords": [
     "react-xlsx",
@@ -36,6 +37,10 @@
     "cross-env": "^5.2.0",
     "cz-emoji": "^1.1.2",
     "tslib": "^1.9.3",
+    "tslint": "^5.13.1",
+    "tslint-config-prettier": "^1.18.0",
+    "tslint-eslint-rules": "^5.4.0",
+    "tslint-react": "^3.6.0",
     "typescript": "^3.3.3333",
     "uglifyjs-webpack-plugin": "^2.1.2",
     "webpack": "^4.29.6",

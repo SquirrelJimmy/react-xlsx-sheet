@@ -4,13 +4,13 @@
       "presets": [
         ["@babel/preset-env", {
           "targets": {
-            "chrome": 72
+            "esmodules": true
           },
           "modules": false,
           "loose": true
-      }],
+        }],
         "@babel/preset-react",
-        "@babel/preset-typescript",
+        "@babel/preset-typescript"
       ],
       "plugins": [
         ["@babel/plugin-transform-typescript", {
@@ -45,7 +45,8 @@
       ],
       "ignore": [
         "**/__tests__/*.js",
-        "**/*.d.ts"
+        "**/*.d.ts",
+        "**/*.test.ts"
       ]
     }
   }
