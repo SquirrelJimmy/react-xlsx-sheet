@@ -94,7 +94,7 @@ const App = (props) => (
 |----------|:-------------:|------:|------:|
 | dataType |  Array-of-Object | string |``['Array-of-Arrays', 'Array-of-Object']``|
 | header |    []   |  参考上面代码, 当dataType="Array-of-Arrays"时可以不传 |-|
-| headerOption | ``{skipHeader: false,dateNF: 'FMT 14'}`` |    object |具体请参考xlsx|
+| headerOption | ``{skipHeader: false,dateNF: 'FMT 14'}`` |    object |``xlsx, xlsm, txt, html, ods``更多请参考<a href="https://github.com/SheetJS/js-xlsx/">XLSX</a>|
 | dataSource | [] |    array | 具体值根据dataType描述 |
 | extName | xlsx |    string |其他扩展名请参考xlsx|
 | isRequiredNameDate | true |  boolean | 文件名是否带有当前日期 |
