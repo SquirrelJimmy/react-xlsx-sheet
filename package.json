@@ -24,7 +24,8 @@
     "build:lib": "cross-env BABEL_ENV=lib babel src --extensions '.tsx,.ts' --out-dir ./lib && cross-env BABEL_ENV=lib node ./scripts/copyDts.js",
     "build:es": "cross-env BABEL_ENV=es  babel src --extensions '.tsx,.ts' --out-dir ./es && cross-env BABEL_ENV=es node ./scripts/copyDts.js",
     "test": "jest",
-    "demo": "webpack-dev-server --config ./demo/webpack.config.js"
+    "demo": "cross-env NODE_ENV=development webpack-dev-server --config ./demo/webpack.config.js",
+    "build:demo": "cross-env NODE_ENV=production webpack --config ./demo/webpack.config.js"
   },
   "keywords": [
     "react-xlsx",

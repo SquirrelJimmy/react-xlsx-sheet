@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import ReactDOM from 'react-dom'
 import XLSX from 'xlsx'
-import ExportSheet from '../lib/export-sheet'
+import {ExportSheet} from '../es'
 import { data, array } from './data.json'
 
 const head = [

@@ -1,6 +1,10 @@
 const path = require('path')
 const webpack = require('webpack')
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
+
+const env = process.env.NODE_ENV
+
 const useTypeScript = true
 const moduleFileExtensions = [
   'web.mjs',
@@ -39,8 +43,36 @@ const babelLoader = {
   }
 };
 
+const outputPath = path.resolve(__dirname, './dist')
+const outputCodeSplit = {
+  vendor: ['react', 'react-dom'],
+  xlsx: ['xlsx']
+}
+const buildOpt = {
+  minimizer: [
+    new UglifyJSPlugin({
+      cache: true,
+      parallel: true,
+      sourceMap: true,
+      uglifyOptions: {
+        beautify: false,
+        comments: /^$/,
+        compress: {
+          warnings: false
+        },
+        mangle: true,
+        output: {
+          comments: false,
+          semicolons: false
+        }
+      }
+    })
+  ],
+  minimize: true,
+}
+const isDev = env === 'development'
 const config = {
-  mode: 'development',
+  mode: isDev ? env : 'production',
   devServer: {
     port: 9000,
     contentBase: path.join(__dirname, './'), // boolean | string | array, static file location
@@ -51,17 +83,18 @@ const config = {
     open: true,
     host: 'localhost'
   },
-  watch: true,
+  watch: isDev,
   entry: {
+    ...(isDev ? {} : outputCodeSplit),
     index: path.resolve(__dirname, './index.js')
   },
   output: {
-    path: undefined,
+    path: isDev ? undefined : outputPath,
     pathinfo: true,
-    filename: 'static/js/bundle.js',
+    filename: 'static/js/[name].js',
     chunkFilename: 'static/js/[name].chunk.js',
     // We use "/" in development.
-    publicPath: '/',
+    publicPath: isDev ? '/' : './',
     // Point sourcemap entries to original disk location (format as URL on Windows)
     devtoolModuleFilenameTemplate: info => path.resolve(info.absoluteResourcePath).replace(/\\/g, '/')
   },
@@ -72,6 +105,7 @@ const config = {
   },
   optimization: {
     concatenateModules: true,
+    ...(isDev ? {} : buildOpt)
   },
   module: {
     rules: [
