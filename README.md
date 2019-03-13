@@ -6,7 +6,8 @@
 yarn demo #查看demo
 yarn test #执行测试用例
 ```
-
+## 查看demo
+<a href="https://sex-squirrel.github.io/react-xlsx-sheet/demo/dist/">demo传送</a>
 ## 基本用法
 > ExportSheet
 #### DOM element
