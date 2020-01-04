@@ -41,9 +41,10 @@ interface Props {
   fileName: string
   fileDate: string
   extName: string
-  isDOMElement: boolean,
-  isRequiredNameDate: boolean,
+  isDOMElement: boolean
+  isRequiredNameDate: boolean
   xlsx: any
+  tableElement?: HTMLTableElement
 }
 
 interface State {
@@ -53,7 +54,11 @@ interface State {
 
 class ExportSheet extends PureComponent<Props, State> {
   static propTypes = {
-    dataType: PropTypes.oneOf(['Array-of-Arrays', 'Array-of-Object']),
+    dataType: PropTypes.oneOf([
+      'Array-of-Arrays',
+      'Array-of-Object',
+      'Table-Node-Selector'
+    ]),
     header: PropTypes.arrayOf(PropTypes.shape({
       title: PropTypes.string,
       dataIndex: PropTypes.string,
@@ -69,6 +74,7 @@ class ExportSheet extends PureComponent<Props, State> {
     isRequiredNameDate: PropTypes.bool,
     isDOMElement: PropTypes.bool.isRequired,
     xlsx: PropTypes.object.isRequired,
+    tableElement: PropTypes.element
   }
   static defaultProps = {
     dataType: 'Array-of-Object',
@@ -101,6 +107,7 @@ class ExportSheet extends PureComponent<Props, State> {
     this.importType = {
       'Array-of-Arrays': 'aoa_to_sheet',
       'Array-of-Object': 'json_to_sheet',
+      'Table-Node-Selector': 'table_to_sheet',
     }
     if (!this.importType[props.dataType]) throw new Error('dataType must be oneOf ["Array-of-Arrays", "Array-of-Object"]')
     this.state = {
@@ -146,14 +153,30 @@ class ExportSheet extends PureComponent<Props, State> {
     }
     return []
   }
-  exportFile = (): any => {
+
+  toSheet = () => {
     const { utilsName, dataSource } = this.state
-    if (!dataSource.length) return
-    const value = this.toRightDate()
+    switch (utilsName) {
+      case 'table_to_sheet':
+        const tableEle = this.props?.tableElement
+        if (tableEle && tableEle instanceof HTMLTableElement) return this.XLSX.utils[utilsName](tableEle)
+        throw "props.tableElement must be instance of HTMLTableElement"
+      case 'aoa_to_sheet':
+      case 'json_to_sheet':
+        if (!dataSource.length) return
+        const value = this.toRightDate()
+        return this.XLSX.utils[utilsName](...value)
+      default:
+        break;
+    }
+
+  }
+
+  exportFile = (): any => {
+    const ws = this.toSheet()
     const { extName, fileName, isRequiredNameDate, fileDate } = this.props
     const name = isRequiredNameDate ? `${fileName}__${fileDate}` : fileName
     const formatName = name.replace(/\\|\/|\?|\*|\[|\]|\s|\{|\}/g, '_')
-    const ws = this.XLSX.utils[utilsName](...value)
     const wb = this.XLSX.utils.book_new()
     this.XLSX.utils.book_append_sheet(wb, ws, formatName)
     this.XLSX.writeFile(wb, `${formatName}.${extName}`)

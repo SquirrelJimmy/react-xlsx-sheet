@@ -23,6 +23,11 @@ const data: Array<object> = [{
   skuPrice: 500,
 }]
 
+const Table = () => {
+
+
+}
+
 const App = (props: any) => <button data-testid="sheet" onClick={props.exportsheet}>123</button>
 
 const baseRender = render(
