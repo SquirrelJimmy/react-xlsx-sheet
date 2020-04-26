@@ -1,15 +1,22 @@
 # react-xlsx-sheet
+
 ## react component for work sheet
-基于xlsx封装, 文档参考 <a href="https://github.com/SheetJS/js-xlsx/">XLSX</a>
+
+基于 xlsx 封装, 文档参考 <a href="https://github.com/SheetJS/js-xlsx/">XLSX</a>
 
 ```bash
 yarn demo #查看demo
 yarn test #执行测试用例
 ```
-## 查看demo
-<a href="https://sex-squirrel.github.io/react-xlsx-sheet/demo/dist/">demo传送</a>
+
+## 查看 demo
+
+<a href="https://sex-squirrel.github.io/react-xlsx-sheet/demo/dist/">demo 传送</a>
+
 ## 基本用法
+
 > ExportSheet
+
 #### DOM element
 
 ```js
@@ -57,8 +64,11 @@ const data = [{
 </ExportSheet>
 
 ```
+
 #### React Component
-> 当children为react组件时希望得到一个props: ```isDOMElement={false}``` 来区别原生dom元素和react组件
+
+> 当 children 为 react 组件时希望得到一个 props: `isDOMElement={false}` 来区别原生 dom 元素和 react 组件
+
 ```js
 import React, { PureComponent } from 'react'
 import ReactDOM from 'react-dom'
@@ -89,21 +99,83 @@ const App = (props) => (
 </ExportSheet>
 
 ```
+
+#### 数据源是一个 table 元素
+
+```tsx
+const Table = () => (
+  <table id="sheetjs">
+    <tbody>
+      <tr>
+        <td>S</td>
+        <td>h</td>
+        <td>e</td>
+        <td>e</td>
+        <td>t</td>
+        <td>J</td>
+        <td>S</td>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td>2</td>
+        <td>3</td>
+        <td>4</td>
+        <td>5</td>
+        <td>6</td>
+        <td>7</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>3</td>
+        <td>4</td>
+        <td>5</td>
+        <td>6</td>
+        <td>7</td>
+        <td>8</td>
+      </tr>
+    </tbody>
+  </table>
+);
+class WithTable extends React.Component {
+  state = {
+    table: null,
+  };
+  componentDidMount() {
+    this.setState({
+      table: document.querySelector('#sheetjs'),
+    });
+  }
+  render() {
+    return (
+      <>
+        <Table />
+        <ExportSheet
+          dataType="Table-Node-Element"
+          fileName={`table`}
+          tableElement={this.state.table}
+          xlsx={XLSX}
+        >
+          <button>Table Input</button>
+        </ExportSheet>
+      </>
+    );
+  }
+}
+```
+
 > API
 
-| 参数   |      默认值      |  类型 | 描述 |
-|----------|:-------------:|------:|------:|
-| dataType |  Array-of-Object | string |``['Array-of-Arrays', 'Array-of-Object']``|
-| header |    []   |  参考上面代码, 当dataType="Array-of-Arrays"时可以不传 |-|
-| headerOption | ``{skipHeader: false,dateNF: 'FMT 14'}`` |    object |``xlsx, xlsm, txt, html, ods``更多请参考<a href="https://github.com/SheetJS/js-xlsx/">XLSX</a>|
-| dataSource | [] |    array | 具体值根据dataType描述 |
-| extName | xlsx |    string |其他扩展名请参考xlsx|
-| isRequiredNameDate | true |  boolean | 文件名是否带有当前日期 |
-| fileName | - |  string | 文件名 |
-| isDOMElement | true |  boolean | children是否是基本dom元素(react component 为 ``false``) |
-| fileDate | 当前日期 |  string | 为文件名指定一个日期(也可以是其他值), 建议默认 |
-
-
-
+| 参数               |                 默认值                 |                                                  类型 |                                                                                         描述 |
+| ------------------ | :------------------------------------: | ----------------------------------------------------: | -------------------------------------------------------------------------------------------: |
+| dataType           |            Array-of-Object             |                                                string |                               `['Array-of-Arrays', 'Array-of-Object', 'Table-Node-Element']` |
+| header             |                   []                   | 参考上面代码, 当 dataType="Array-of-Arrays"时可以不传 |                                                                                            - |
+| headerOption       | `{skipHeader: false,dateNF: 'FMT 14'}` |                                                object | `xlsx, xlsm, txt, html, ods`更多请参考<a href="https://github.com/SheetJS/js-xlsx/">XLSX</a> |
+| dataSource         |                   []                   |                                                 array |                                                                     具体值根据 dataType 描述 |
+| extName            |                  xlsx                  |                                                string |                                                                        其他扩展名请参考 xlsx |
+| isRequiredNameDate |                  true                  |                                               boolean |                                                                       文件名是否带有当前日期 |
+| fileName           |                   -                    |                                                string |                                                                                       文件名 |
+| isDOMElement       |                  true                  |                                               boolean |                                     children 是否是基本 dom 元素(react component 为 `false`) |
+| fileDate           |                当前日期                |                                                string |                                               为文件名指定一个日期(也可以是其他值), 建议默认 |
+| tableElement       |         输入数据的 table 元素          |                                      HTMLTableElement |                                    `dataType="Table-Node-Element"` 时必须提供一个 table 元素 |
 
 ### ps:其他功能组件还在开发中

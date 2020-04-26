@@ -1,11 +1,10 @@
-const path = require('path')
-const pkg = require('../package.json')
-const webpack = require('webpack')
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
+const path = require('path');
+const pkg = require('../package.json');
+const webpack = require('webpack');
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
-
-const env = process.env.NODE_ENV
-const useTypeScript = true
+const env = process.env.NODE_ENV;
+const useTypeScript = true;
 const moduleFileExtensions = [
   'web.mjs',
   'mjs',
@@ -18,37 +17,46 @@ const moduleFileExtensions = [
   'json',
   'web.jsx',
   'jsx',
-]
+];
 
 const babelLoader = {
   loader: 'babel-loader',
   options: {
     cacheDirectory: true,
     presets: [
-      ["@babel/preset-env", {
-        "targets": {
-          "browsers": ["last 2 versions", "safari >= 7", "ie >= 11"]
-        }
-      }],
+      [
+        '@babel/preset-env',
+        {
+          targets: {
+            browsers: ['last 2 versions', 'safari >= 7', 'ie >= 11'],
+          },
+        },
+      ],
       '@babel/preset-react',
     ],
     plugins: [
-      "@babel/plugin-proposal-nullish-coalescing-operator",
-      "@babel/plugin-proposal-optional-chaining",
-      ["@babel/plugin-transform-typescript", {
-        "isTSX": true
-      }],
-      ["@babel/plugin-proposal-class-properties", {
-        "loose": true
-      }]
-    ]
-  }
+      '@babel/plugin-proposal-nullish-coalescing-operator',
+      '@babel/plugin-proposal-optional-chaining',
+      [
+        '@babel/plugin-transform-typescript',
+        {
+          isTSX: true,
+        },
+      ],
+      [
+        '@babel/plugin-proposal-class-properties',
+        {
+          loose: true,
+        },
+      ],
+    ],
+  },
 };
 
 const config = {
   mode: 'production',
   entry: {
-    index: path.resolve(__dirname, '../src/index.tsx')
+    index: path.resolve(__dirname, '../src/index.tsx'),
   },
   output: {
     path: path.resolve(__dirname, '../dist'),
@@ -58,8 +66,8 @@ const config = {
   },
   resolve: {
     extensions: moduleFileExtensions
-      .map(ext => `.${ext}`)
-      .filter(ext => useTypeScript || !ext.includes('ts')),
+      .map((ext) => `.${ext}`)
+      .filter((ext) => useTypeScript || !ext.includes('ts')),
   },
   optimization: {
     concatenateModules: true,
@@ -71,16 +79,14 @@ const config = {
         uglifyOptions: {
           beautify: false,
           comments: /^$/,
-          compress: {
-            warnings: false
-          },
+          warnings: false,
           mangle: true,
           output: {
             comments: false,
-            semicolons: false
-          }
-        }
-      })
+            semicolons: false,
+          },
+        },
+      }),
     ],
     minimize: true,
   },
@@ -88,28 +94,15 @@ const config = {
     rules: [
       {
         test: /\.ts(x?)$/,
-        exclude: [
-          '/demo/',
-          '/dist/',
-          '/node_modules/',
-        ],
-        use: [
-          babelLoader,
-        ],
-
+        exclude: ['/demo/', '/dist/', '/node_modules/'],
+        use: [babelLoader],
       },
       {
         test: /\.js$/,
-        exclude: [
-          '/demo/',
-          '/dist/',
-          '/node_modules/',
-        ],
-        use: [
-          babelLoader
-        ]
-      }
-    ]
+        exclude: ['/demo/', '/dist/', '/node_modules/'],
+        use: [babelLoader],
+      },
+    ],
   },
   externals: [
     {
@@ -117,37 +110,35 @@ const config = {
         root: 'React',
         commonjs2: 'react',
         commonjs: 'react',
-        amd: 'react'
+        amd: 'react',
       },
       'react-dom': {
         root: 'ReactDOM',
         commonjs2: 'react-dom',
         commonjs: 'react-dom',
-        amd: 'react-dom'
+        amd: 'react-dom',
       },
       'react-dom/server': {
         root: 'ReactDOMServer',
         commonjs2: 'react-dom/server',
         commonjs: 'react-dom/server',
-        amd: 'react-dom/server'
+        amd: 'react-dom/server',
       },
       'prop-types': {
         root: 'PropTypes',
         commonjs2: 'prop-types',
         commonjs: 'prop-types',
-        amd: 'prop-types'
+        amd: 'prop-types',
       },
       xlsx: {
         root: 'XLSX',
         commonjs2: 'xlsx',
         commonjs: 'xlsx',
-        amd: 'xlsx'
-      }
-    }
+        amd: 'xlsx',
+      },
+    },
   ],
-  plugins: [
-    new webpack.optimize.OccurrenceOrderPlugin()
-  ],
-}
+  plugins: [new webpack.optimize.OccurrenceOrderPlugin()],
+};
 
-module.exports = config
+module.exports = config;

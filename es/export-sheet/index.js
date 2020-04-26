@@ -4,7 +4,7 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import isEmpty from 'lodash/isEmpty';
 import isFunction from 'lodash/isFunction';
-const supportExt = ['xlsx', 'xlsm', 'xlsb', 'xls', 'ods', 'fods', 'csv', 'txt', 'sylk', 'html', 'dif', 'dbf', 'rtf', 'prn', 'eth'];
+var supportExt = ['xlsx', 'xlsm', 'xlsb', 'xls', 'ods', 'fods', 'csv', 'txt', 'sylk', 'html', 'dif', 'dbf', 'rtf', 'prn', 'eth'];
 
 class ExportSheet extends PureComponent {
   // 存储新的dataSource
@@ -25,20 +25,21 @@ class ExportSheet extends PureComponent {
     this.toSheet = () => {
       var _this$props;
 
-      const _this$state = this.state,
-            utilsName = _this$state.utilsName,
-            dataSource = _this$state.dataSource;
+      var {
+        utilsName,
+        dataSource
+      } = this.state;
 
       switch (utilsName) {
         case 'table_to_sheet':
-          const tableEle = (_this$props = this.props) === null || _this$props === void 0 ? void 0 : _this$props.tableElement;
+          var tableEle = (_this$props = this.props) === null || _this$props === void 0 ? void 0 : _this$props.tableElement;
           if (tableEle && tableEle instanceof HTMLTableElement) return this.XLSX.utils[utilsName](tableEle);
-          throw "props.tableElement must be instance of HTMLTableElement";
+          throw 'props.tableElement must be instance of HTMLTableElement';
 
         case 'aoa_to_sheet':
         case 'json_to_sheet':
           if (!dataSource.length) return;
-          const value = this.toRightDate();
+          var value = this.toRightDate();
           return this.XLSX.utils[utilsName](...value);
 
         default:
@@ -47,26 +48,27 @@ class ExportSheet extends PureComponent {
     };
 
     this.exportFile = () => {
-      const ws = this.toSheet();
-      const _this$props2 = this.props,
-            extName = _this$props2.extName,
-            fileName = _this$props2.fileName,
-            isRequiredNameDate = _this$props2.isRequiredNameDate,
-            fileDate = _this$props2.fileDate;
-      const name = isRequiredNameDate ? `${fileName}__${fileDate}` : fileName;
-      const formatName = name.replace(/\\|\/|\?|\*|\[|\]|\s|\{|\}/g, '_');
-      const wb = this.XLSX.utils.book_new();
+      var ws = this.toSheet();
+      var {
+        extName,
+        fileName,
+        isRequiredNameDate,
+        fileDate
+      } = this.props;
+      var name = isRequiredNameDate ? fileName + "__" + fileDate : fileName;
+      var formatName = name.replace(/\\|\/|\?|\*|\[|\]|\s|\{|\}/g, '_');
+      var wb = this.XLSX.utils.book_new();
       this.XLSX.utils.book_append_sheet(wb, ws, formatName);
-      this.XLSX.writeFile(wb, `${formatName}.${extName}`);
+      this.XLSX.writeFile(wb, formatName + "." + extName);
     };
 
     if (!supportExt.includes(props.extName)) throw new Error('extName not suport');
     this.importType = {
       'Array-of-Arrays': 'aoa_to_sheet',
       'Array-of-Object': 'json_to_sheet',
-      'Table-Node-Selector': 'table_to_sheet'
+      'Table-Node-Element': 'table_to_sheet'
     };
-    if (!this.importType[props.dataType]) throw new Error('dataType must be oneOf ["Array-of-Arrays", "Array-of-Object"]');
+    if (!this.importType[props.dataType]) throw new Error('dataType must be oneOf [ ' + 'Array-of-Arrays,' + 'Array-of-Object,' + 'Table-Node-Element' + ']');
     this.state = {
       utilsName: this.importType[props.dataType],
       dataSource: props.dataSource
@@ -74,18 +76,23 @@ class ExportSheet extends PureComponent {
   }
 
   toRightDate() {
-    const _this$props3 = this.props,
-          header = _this$props3.header,
-          headerOption = _this$props3.headerOption;
-    const dataSource = this.state.dataSource;
-    const dataType = this.props.dataType;
-    const resultValues = [];
-    const resultHeaders = []; // !Array.isArray(props.dataSource[0]))
+    var {
+      header,
+      headerOption
+    } = this.props;
+    var {
+      dataSource
+    } = this.state;
+    var {
+      dataType
+    } = this.props;
+    var resultValues = [];
+    var resultHeaders = []; // !Array.isArray(props.dataSource[0]))
 
     if (dataType === 'Array-of-Object') {
       dataSource.map(value => {
         if (isEmpty(value)) throw new Error('dataSource must be like Array-of-Object type, the Object not be empty');
-        const dealedObj = {};
+        var dealedObj = {};
         header.map(key => {
           dealedObj[key.title] = value[key.dataIndex];
           if (resultValues.includes(dealedObj)) return true;
@@ -113,16 +120,17 @@ class ExportSheet extends PureComponent {
   }
 
   render() {
-    const _this$props4 = this.props,
-          children = _this$props4.children,
-          isDOMElement = _this$props4.isDOMElement;
-    let ResultElement;
+    var {
+      children,
+      isDOMElement
+    } = this.props;
+    var ResultElement;
 
     if (React.isValidElement(children)) {
-      const originHandler = children.props.onClick;
+      var originHandler = children.props.onClick;
 
       if (isDOMElement) {
-        const exportHandler = event => {
+        var exportHandler = event => {
           this.exportFile();
 
           if (isFunction(originHandler)) {
@@ -148,7 +156,7 @@ class ExportSheet extends PureComponent {
 }
 
 ExportSheet.propTypes = {
-  dataType: PropTypes.oneOf(['Array-of-Arrays', 'Array-of-Object', 'Table-Node-Selector']),
+  dataType: PropTypes.oneOf(['Array-of-Arrays', 'Array-of-Object', 'Table-Node-Element']),
   header: PropTypes.arrayOf(PropTypes.shape({
     title: PropTypes.string,
     dataIndex: PropTypes.string
@@ -165,7 +173,7 @@ ExportSheet.propTypes = {
   isRequiredNameDate: PropTypes.bool,
   isDOMElement: PropTypes.bool.isRequired,
   xlsx: PropTypes.object.isRequired,
-  tableElement: PropTypes.element
+  tableElement: PropTypes.object
 };
 ExportSheet.defaultProps = {
   dataType: 'Array-of-Object',
