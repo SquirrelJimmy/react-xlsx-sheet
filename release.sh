@@ -19,3 +19,16 @@ fi;
 
 echo "Branch is $branch"
 echo "Release as $release"
+
+# Tag prefix
+prefix=""
+
+git pull origin $branch
+echo "Current pull origin $branch."
+
+# Generate version number and tag
+standard-version -r $release --tag-prefix $prefix --infile CHANGELOG.md
+
+git push --follow-tags origin $branch
+
+echo "Release finished."
