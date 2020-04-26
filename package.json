@@ -26,7 +26,8 @@
     "build:es": "cross-env BABEL_ENV=es  babel src --extensions '.tsx,.ts' --out-dir ./es && cross-env BABEL_ENV=es node ./scripts/copyDts.js",
     "test": "jest --coverage",
     "demo": "cross-env NODE_ENV=development webpack-dev-server --config ./demo/webpack.config.js",
-    "build:demo": "cross-env NODE_ENV=production webpack --config ./demo/webpack.config.js"
+    "build:demo": "cross-env NODE_ENV=production webpack --config ./demo/webpack.config.js",
+    "release": "./scripts/release.sh"
   },
   "keywords": [
     "react-xlsx",
@@ -99,7 +100,6 @@
     "cz-emoji": "^1.2.1",
     "husky": "^4.2.5",
     "lint-staged": "^10.1.7",
-    "prettier": "^2.0.5",
-    "standard-version": "^7.1.0"
+    "prettier": "^2.0.5"
   }
 }
