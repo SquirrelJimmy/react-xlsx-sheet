@@ -27,7 +27,7 @@
     "test": "jest --coverage",
     "demo": "cross-env NODE_ENV=development webpack-dev-server --config ./demo/webpack.config.js",
     "build:demo": "cross-env NODE_ENV=production webpack --config ./demo/webpack.config.js",
-    "release": "./scripts/release.sh"
+    "release": "./release.sh"
   },
   "keywords": [
     "react-xlsx",
